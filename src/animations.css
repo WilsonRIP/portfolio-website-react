@@ -1,0 +1,137 @@
+/* 
+  Optimized animations using transform and opacity 
+  for better performance with hardware acceleration
+*/
+
+/* Optimized fade-in animation */
+.animate-fade-in {
+  animation: optimizedFadeIn 0.8s ease forwards;
+  will-change: opacity, transform;
+}
+
+.initial-hidden {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+@keyframes optimizedFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Optimized bounce animation that uses transform instead of margin/padding */
+.animate-optimal-bounce {
+  animation: optimizedBounce 2s infinite;
+  will-change: transform;
+}
+
+@keyframes optimizedBounce {
+  0%, 100% {
+    transform: translateY(0);
+    animation-timing-function: cubic-bezier(0.8, 0, 1, 1);
+  }
+  50% {
+    transform: translateY(-10px);
+    animation-timing-function: cubic-bezier(0, 0, 0.2, 1);
+  }
+}
+
+/* Optimized background fade in */
+.bg-fade-in {
+  animation: bgFadeIn 1.5s ease-out forwards;
+  will-change: opacity;
+}
+
+@keyframes bgFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Optimized text appear animation */
+.text-reveal {
+  animation: textReveal 0.5s ease-out forwards;
+  transform-origin: left center;
+  will-change: transform, opacity;
+}
+
+@keyframes textReveal {
+  from {
+    transform: scaleX(0);
+    opacity: 0;
+  }
+  to {
+    transform: scaleX(1);
+    opacity: 1;
+  }
+}
+
+/* New Animations and Styles */
+
+/* Gradient animation for text */
+.animate-gradient {
+  background-size: 200% auto;
+  animation: gradientShift 4s ease-in-out infinite alternate;
+  will-change: background-position;
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% center;
+  }
+  100% {
+    background-position: 100% center;
+  }
+}
+
+/* Text shadows */
+.text-shadow-subtle {
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.text-shadow-glow {
+  text-shadow: 0 0 5px rgba(var(--color-primary-rgb, 99, 102, 241), 0.5),
+               0 0 15px rgba(var(--color-primary-rgb, 99, 102, 241), 0.3);
+}
+
+/* Text reveal animation */
+.animate-text-reveal {
+  animation: textRevealFade 1s ease forwards;
+  opacity: 1 !important;
+}
+
+@keyframes textRevealFade {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Fade in up animation */
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s ease-out forwards;
+}
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+} 

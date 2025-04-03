@@ -1,33 +1,6 @@
 import { useState, useEffect } from 'react';
-import { FiGithub, FiExternalLink, FiCode, FiVideo, FiCamera, FiEdit, FiYoutube } from 'react-icons/fi';
-
-interface Project {
-  id: number;
-  title: string;
-  description: string;
-  image: string;
-  tags: string[];
-  githubUrl: string;
-  liveUrl?: string;
-  type: string; // 'Development', 'Video Editing', 'Photography', 'Photoshop', 'Streaming/YouTube'
-}
-
-// GitHub repository interface
-interface GitHubRepo {
-  id: number;
-  name: string;
-  description: string | null;
-  html_url: string;
-  homepage: string | null;
-  owner: {
-    login: string;
-  };
-}
-
-// GitHub topics interface
-interface GitHubTopics {
-  names: string[];
-}
+import { FiGithub, FiExternalLink, FiCode, FiVideo, FiCamera, FiEdit, FiYoutube, FiRefreshCw } from 'react-icons/fi';
+import useGitHubProjects, { Project } from '../hooks/useGitHubProjects';
 
 const ProjectCard = ({ project }: { project: Project }) => (
   <div className="card overflow-hidden flex flex-col h-full">
@@ -36,6 +9,9 @@ const ProjectCard = ({ project }: { project: Project }) => (
         src={project.image} 
         alt={project.title} 
         className="w-full h-full object-cover"
+        loading="lazy"
+        width="600"
+        height="400"
       />
     </div>
     
@@ -97,12 +73,40 @@ const FilterButton = ({ active, type, icon: Icon, onClick }: { active: boolean; 
   </button>
 );
 
+// Loading spinner component
+const LoadingSpinner = () => (
+  <div className="flex justify-center items-center py-20">
+    <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary dark:border-secondary"></div>
+  </div>
+);
+
+// Error message component
+const ErrorMessage = ({ message }: { message: string }) => (
+  <div className="bg-red-100 dark:bg-red-900/20 text-red-700 dark:text-red-300 p-4 rounded-lg mb-8">
+    <p>{message}</p>
+    <p className="mt-2">Showing sample projects instead.</p>
+  </div>
+);
+
 const Projects = () => {
-  const [projects, setProjects] = useState<Project[]>([]);
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
   const [activeFilter, setActiveFilter] = useState<string>('All');
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
+  
+  // GitHub username - you can replace this with your own
+  const githubUsername = 'WilsonRIP';
+  
+  // Use our custom hook for GitHub projects
+  const { 
+    projects, 
+    error, 
+    isLoading, 
+    isValidating, 
+    lastUpdated, 
+    refresh 
+  } = useGitHubProjects({
+    username: githubUsername,
+    refreshInterval: 5 * 60 * 1000, // 5 minutes
+  });
 
   // Filter categories
   const filters = [
@@ -114,119 +118,7 @@ const Projects = () => {
     { type: 'Streaming/YouTube', icon: FiYoutube }
   ];
 
-  useEffect(() => {
-    // Fetch GitHub repositories
-    const fetchProjects = async () => {
-      try {
-        setLoading(true);
-        
-        // Fetch from GitHub API - Replace 'username' with actual GitHub username
-        const response = await fetch('https://api.github.com/users/WilsonRIP/repos');
-        
-        if (!response.ok) {
-          throw new Error(`Failed to fetch GitHub repositories: ${response.status} ${response.statusText}`);
-        }
-        
-        const data = await response.json() as GitHubRepo[];
-        
-        // Check if there are any repositories
-        if (data.length === 0) {
-          throw new Error('No repositories found for this user');
-        }
-        
-        // Map GitHub data to our Project interface
-        // We'll use the topics as tags and to determine the project type
-        const mappedProjects: Project[] = await Promise.all(
-          data.map(async (repo: GitHubRepo) => {
-            // Fetch topics (tags) for each repository
-            const topicsResponse = await fetch(`https://api.github.com/repos/WilsonRIP/${repo.name}/topics`, {
-              headers: {
-                Accept: 'application/vnd.github.mercy-preview+json'
-              }
-            });
-            
-            let topics: string[] = [];
-            let projectType = 'Development'; // Default type
-            
-            if (topicsResponse.ok) {
-              const topicsData = await topicsResponse.json() as GitHubTopics;
-              topics = topicsData.names || [];
-              
-              // Determine project type based on topics
-              if (topics.includes('video-editing')) {
-                projectType = 'Video Editing';
-              } else if (topics.includes('photography')) {
-                projectType = 'Photography';
-              } else if (topics.includes('photoshop')) {
-                projectType = 'Photoshop';
-              } else if (topics.includes('streaming') || topics.includes('youtube')) {
-                projectType = 'Streaming/YouTube';
-              }
-            }
-            
-            return {
-              id: repo.id,
-              title: repo.name,
-              description: repo.description || 'No description provided',
-              image: `https://opengraph.githubassets.com/1/${repo.owner.login}/${repo.name}`,
-              tags: topics,
-              githubUrl: repo.html_url,
-              liveUrl: repo.homepage || undefined,
-              type: projectType
-            };
-          })
-        );
-        
-        setProjects(mappedProjects);
-        setFilteredProjects(mappedProjects);
-        setLoading(false);
-      } catch (err) {
-        const errorMessage = err instanceof Error ? err.message : 'Unknown error occurred';
-        setError(`Error fetching projects: ${errorMessage}`);
-        setLoading(false);
-        console.error(err);
-        
-        // Fallback to sample projects if GitHub API fails
-        const sampleProjects: Project[] = [
-          {
-            id: 1,
-            title: "Portfolio Website",
-            description: "A personal portfolio website built with React and Tailwind CSS.",
-            image: "https://via.placeholder.com/600x400?text=Portfolio+Website",
-            tags: ["React", "TypeScript", "Tailwind CSS"],
-            githubUrl: "https://github.com/WilsonRIP/portfolio",
-            liveUrl: "https://yourportfolio.com",
-            type: "Development"
-          },
-          {
-            id: 2,
-            title: "Video Editing Project",
-            description: "A showcase of video editing skills and techniques.",
-            image: "https://via.placeholder.com/600x400?text=Video+Editing",
-            tags: ["Premiere Pro", "After Effects"],
-            githubUrl: "https://github.com/WilsonRIP/video-portfolio",
-            type: "Video Editing"
-          },
-          {
-            id: 3,
-            title: "Photography Portfolio",
-            description: "A collection of photography work.",
-            image: "https://via.placeholder.com/600x400?text=Photography",
-            tags: ["Photography", "Lightroom"],
-            githubUrl: "https://github.com/WilsonRIP/photo-portfolio",
-            type: "Photography"
-          }
-        ];
-        
-        setProjects(sampleProjects);
-        setFilteredProjects(sampleProjects);
-      }
-    };
-    
-    fetchProjects();
-  }, []);
-  
-  // Filter projects when active filter changes
+  // Update filtered projects when active filter changes
   useEffect(() => {
     if (activeFilter === 'All') {
       setFilteredProjects(projects);
@@ -235,48 +127,85 @@ const Projects = () => {
       setFilteredProjects(filtered);
     }
   }, [activeFilter, projects]);
-  
+
   // Handle filter button click
   const handleFilterClick = (type: string) => {
     setActiveFilter(type);
   };
 
+  // Format the last updated time
+  const formatLastUpdated = (date: Date | null) => {
+    if (!date) return 'Never';
+    
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    
+    if (diffMins < 1) return 'Just now';
+    if (diffMins < 60) return `${diffMins} minute${diffMins === 1 ? '' : 's'} ago`;
+    
+    const diffHours = Math.floor(diffMins / 60);
+    if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
+    
+    const diffDays = Math.floor(diffHours / 24);
+    return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
+  };
+
   return (
     <section id="projects" className="py-16 px-4 bg-gray-50 dark:bg-gray-800/30">
       <div className="container mx-auto">
-        {/* Filter buttons */}
-        <div className="flex flex-wrap justify-center gap-3 mb-10">
-          {filters.map((filter) => (
-            <FilterButton
-              key={filter.type}
-              type={filter.type}
-              icon={filter.icon}
-              active={activeFilter === filter.type}
-              onClick={() => handleFilterClick(filter.type)}
-            />
-          ))}
+        <div className="flex flex-wrap justify-between items-center mb-8">
+          {/* Filter buttons - wrapped in a div */}
+          <div className="flex flex-wrap justify-center gap-3 mb-4 md:mb-0">
+            {filters.map((filter) => (
+              <FilterButton
+                key={filter.type}
+                active={activeFilter === filter.type}
+                type={filter.type}
+                icon={filter.icon}
+                onClick={() => handleFilterClick(filter.type)}
+              />
+            ))}
+          </div>
+          
+          {/* Refresh and last updated info */}
+          <div className="flex flex-col items-end">
+            <button 
+              onClick={refresh}
+              disabled={isValidating}
+              className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+              aria-label="Refresh projects"
+            >
+              <FiRefreshCw className={`w-4 h-4 ${isValidating ? 'animate-spin' : ''}`} />
+              <span>{isValidating ? 'Refreshing...' : 'Refresh'}</span>
+            </button>
+            <span className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+              Last updated: {formatLastUpdated(lastUpdated)}
+            </span>
+          </div>
         </div>
         
-        {loading ? (
-          <div className="flex justify-center items-center h-64">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary dark:border-secondary"></div>
-          </div>
-        ) : error ? (
-          <div className="card p-6 text-center">
-            <div className="mb-4 text-red-500 dark:text-red-400">⚠️</div>
-            <h3 className="text-xl font-semibold mb-2">Could not load projects from GitHub</h3>
-            <p className="text-gray-600 dark:text-gray-300 mb-4">{error}</p>
-            <p className="text-gray-600 dark:text-gray-300">Showing sample projects instead</p>
-          </div>
-        ) : filteredProjects.length === 0 ? (
-          <div className="card p-6 text-center">
-            <p className="text-gray-600 dark:text-gray-300">No projects found for this category.</p>
-          </div>
+        {/* Error message */}
+        {error && (
+          <ErrorMessage message={error.message || 'Error fetching projects'} />
+        )}
+        
+        {/* Loading state */}
+        {isLoading ? (
+          <LoadingSpinner />
         ) : (
+          /* Projects grid with virtualization for better performance */
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredProjects.map((project) => (
               <ProjectCard key={project.id} project={project} />
             ))}
+          </div>
+        )}
+        
+        {/* No projects message */}
+        {!isLoading && !error && filteredProjects.length === 0 && (
+          <div className="text-center py-10">
+            <p className="text-gray-500 dark:text-gray-400">No projects found for this category.</p>
           </div>
         )}
       </div>
