@@ -86,8 +86,6 @@ const Contact = () => {
   return (
     <section id="contact" className="py-16 px-4">
       <div className="container mx-auto">
-        <h2 className="text-3xl font-bold mb-12 text-center">Contact Me</h2>
-        
         <div className="max-w-xl mx-auto">
           <div className="card">
             {isSubmitted ? (

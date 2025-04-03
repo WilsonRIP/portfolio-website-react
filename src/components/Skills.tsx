@@ -9,7 +9,7 @@ const SkillCard = ({
   description: string; 
   icon: React.ElementType 
 }) => (
-  <div className="card hover:scale-105">
+  <div className="card hover:scale-105 transition-all duration-300">
     <div className="mb-4 text-primary dark:text-secondary">
       <Icon className="w-8 h-8" />
     </div>
@@ -50,7 +50,7 @@ const Skills = () => {
   return (
     <section id="skills" className="py-16 px-4">
       <div className="container mx-auto">
-        <h2 className="text-3xl font-bold mb-12 text-center">My Skills</h2>
+        <h2 className="text-3xl font-bold mb-12 text-center text-gray-900 dark:text-white">My Skills</h2>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {skills.map((skill, index) => (

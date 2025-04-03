@@ -1,4 +1,7 @@
-import { FiGithub, FiTwitter, FiInstagram, FiYoutube, FiTwitch } from 'react-icons/fi';
+import { FiYoutube } from 'react-icons/fi';
+import { FaDiscord } from 'react-icons/fa';
+import githubIcon from '../assets/github.png';
+import twitchIcon from '../assets/twitch.png';
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
@@ -16,34 +19,16 @@ const Footer = () => {
           
           <div className="flex space-x-4 mb-4 md:mb-0">
             <a 
-              href="#" 
+              href="https://github.com/WilsonRIP" 
               target="_blank" 
               rel="noopener noreferrer"
               aria-label="GitHub"
               className="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-secondary transition-colors"
             >
-              <FiGithub className="w-5 h-5" />
+              <img src={githubIcon} alt="GitHub" className="w-5 h-5 object-contain" />
             </a>
             <a 
-              href="#" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              aria-label="Twitter"
-              className="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-secondary transition-colors"
-            >
-              <FiTwitter className="w-5 h-5" />
-            </a>
-            <a 
-              href="#" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              aria-label="Instagram"
-              className="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-secondary transition-colors"
-            >
-              <FiInstagram className="w-5 h-5" />
-            </a>
-            <a 
-              href="#" 
+              href="https://www.youtube.com/@wilsonrip" 
               target="_blank" 
               rel="noopener noreferrer"
               aria-label="YouTube"
@@ -52,13 +37,22 @@ const Footer = () => {
               <FiYoutube className="w-5 h-5" />
             </a>
             <a 
-              href="#" 
+              href="https://www.twitch.tv/wilsoniirip" 
               target="_blank" 
               rel="noopener noreferrer"
               aria-label="Twitch"
               className="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-secondary transition-colors"
             >
-              <FiTwitch className="w-5 h-5" />
+              <img src={twitchIcon} alt="Twitch" className="w-5 h-5 object-contain" />
+            </a>
+            <a 
+              href="https://discord.gg/wKHnwHYgzF" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              aria-label="Discord"
+              className="text-gray-600 hover:text-primary dark:text-gray-300 dark:hover:text-secondary transition-colors"
+            >
+              <FaDiscord className="w-5 h-5" />
             </a>
           </div>
         </div>

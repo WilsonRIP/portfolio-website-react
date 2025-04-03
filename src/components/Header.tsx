@@ -1,10 +1,12 @@
 import { useState, useContext } from 'react';
+import { Link, useLocation } from 'react-router-dom';
 import { FiSun, FiMoon, FiMenu, FiX } from 'react-icons/fi';
 import { ThemeContext } from './ThemeProvider';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const themeContext = useContext(ThemeContext);
+  const location = useLocation();
   
   if (!themeContext) {
     throw new Error('Header must be used within a ThemeProvider');
@@ -16,20 +18,52 @@ const Header = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
+  // Function to check if a path is active
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
+
   return (
     <header className="py-4 px-4 md:px-6 shadow-sm bg-white dark:bg-gray-800/80 dark:backdrop-blur-sm">
       <div className="container mx-auto flex justify-between items-center">
         {/* Logo */}
-        <a href="#" className="text-xl font-bold text-primary">WilsonIIRIP</a>
+        <Link to="/" className="text-xl font-bold text-primary">WilsonIIRIP</Link>
         
         {/* Desktop Navigation */}
         <nav className="hidden md:block">
           <ul className="flex space-x-8">
-            <li><a href="#" className="hover:text-primary transition-colors">Home</a></li>
-            <li><a href="#about" className="hover:text-primary transition-colors">About</a></li>
-            <li><a href="#skills" className="hover:text-primary transition-colors">Skills</a></li>
-            <li><a href="#projects" className="hover:text-primary transition-colors">Projects</a></li>
-            <li><a href="#contact" className="hover:text-primary transition-colors">Contact</a></li>
+            <li>
+              <Link 
+                to="/" 
+                className={`transition-colors ${isActive('/') ? 'text-primary font-semibold' : 'hover:text-primary'}`}
+              >
+                Home
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/about" 
+                className={`transition-colors ${isActive('/about') ? 'text-primary font-semibold' : 'hover:text-primary'}`}
+              >
+                About
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/projects" 
+                className={`transition-colors ${isActive('/projects') ? 'text-primary font-semibold' : 'hover:text-primary'}`}
+              >
+                Projects
+              </Link>
+            </li>
+            <li>
+              <Link 
+                to="/contact" 
+                className={`transition-colors ${isActive('/contact') ? 'text-primary font-semibold' : 'hover:text-primary'}`}
+              >
+                Contact
+              </Link>
+            </li>
           </ul>
         </nav>
         
@@ -60,11 +94,42 @@ const Header = () => {
         <div className="md:hidden absolute left-0 right-0 bg-white dark:bg-gray-800 shadow-md z-10 py-4 px-4">
           <nav>
             <ul className="flex flex-col space-y-4">
-              <li><a href="#" className="block py-2 hover:text-primary transition-colors" onClick={toggleMenu}>Home</a></li>
-              <li><a href="#about" className="block py-2 hover:text-primary transition-colors" onClick={toggleMenu}>About</a></li>
-              <li><a href="#skills" className="block py-2 hover:text-primary transition-colors" onClick={toggleMenu}>Skills</a></li>
-              <li><a href="#projects" className="block py-2 hover:text-primary transition-colors" onClick={toggleMenu}>Projects</a></li>
-              <li><a href="#contact" className="block py-2 hover:text-primary transition-colors" onClick={toggleMenu}>Contact</a></li>
+              <li>
+                <Link 
+                  to="/" 
+                  className={`block py-2 transition-colors ${isActive('/') ? 'text-primary font-semibold' : 'hover:text-primary'}`}
+                  onClick={toggleMenu}
+                >
+                  Home
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/about" 
+                  className={`block py-2 transition-colors ${isActive('/about') ? 'text-primary font-semibold' : 'hover:text-primary'}`}
+                  onClick={toggleMenu}
+                >
+                  About
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/projects" 
+                  className={`block py-2 transition-colors ${isActive('/projects') ? 'text-primary font-semibold' : 'hover:text-primary'}`}
+                  onClick={toggleMenu}
+                >
+                  Projects
+                </Link>
+              </li>
+              <li>
+                <Link 
+                  to="/contact" 
+                  className={`block py-2 transition-colors ${isActive('/contact') ? 'text-primary font-semibold' : 'hover:text-primary'}`}
+                  onClick={toggleMenu}
+                >
+                  Contact
+                </Link>
+              </li>
             </ul>
           </nav>
         </div>
